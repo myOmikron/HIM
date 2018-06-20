@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
 
@@ -21,17 +20,31 @@ public class ClientHandler implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	private ArrayList<Integer> getInt() {
-		ArrayList<Integer> intList = new ArrayList<>();
-		
-		
-		
-		return intList;
-	}
 
 	@Override
 	public void run() {
-		
+		while(!connection.isClosed()) {
+			try {
+				String s = in.readUTF();
+				
+				switch(s) {
+				case "LOGIN":
+					break;
+				case "DIRECT":
+					break;
+				case "GROUP":
+					break;
+				case "NEWGROUP":
+					break;
+				case "":
+					break;
+				default:
+					break;				
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

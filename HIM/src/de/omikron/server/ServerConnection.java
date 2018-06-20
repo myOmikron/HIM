@@ -16,9 +16,10 @@ public class ServerConnection {
 		this.isWaitingForClients = true;
 	}
 	
+	@SuppressWarnings("resource")
 	protected void init() {
 		try {
-			System.out.println("Starting Server ..");
+			System.out.println("Starting server ..");
 			server = new ServerSocket(port);
 			System.out.println("Server started.");
 			

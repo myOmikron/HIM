@@ -8,8 +8,8 @@ public abstract class Main {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				Backend clientBack = new Backend();
-				clientBack.init();
+				Backend back = new Backend();
+				back.init();
 			}
 		});
 	}

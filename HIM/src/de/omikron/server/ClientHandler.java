@@ -11,8 +11,11 @@ public class ClientHandler implements Runnable {
 	private DataInputStream in;
 	private DataOutputStream out;
 	
-	public ClientHandler(Socket connection) {
+	private ServerConnection parent;
+	
+	public ClientHandler(ServerConnection parent, Socket connection) {
 		this.connection = connection;
+		this.parent = parent;
 		try {
 			in = new DataInputStream(connection.getInputStream());
 			out = new DataOutputStream(connection.getOutputStream());
@@ -26,7 +29,13 @@ public class ClientHandler implements Runnable {
 		while(!connection.isClosed()) {
 			try {
 				String s = in.readUTF();
+				while(s != null) {
+					System.out.println("[Server] Message from Client: " + s);
+					parent.sendToAllClients(s);
+					s = in.readUTF();
+				}
 				
+				/*
 				switch(s) {
 				case "LOGIN":
 					break;
@@ -41,10 +50,21 @@ public class ClientHandler implements Runnable {
 				default:
 					break;				
 				}
+				*/
+				
+
 				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	protected void sendMsg(String msg) {
+		try {
+			out.writeUTF(msg);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

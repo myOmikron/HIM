@@ -1,5 +1,7 @@
 package de.omikron.server;
 
+import de.omikron.client.Frontend;
+
 public class Backend {
 	
 	private ServerConnection server;

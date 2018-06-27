@@ -1,5 +1,8 @@
 package de.omikron.client;
 
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -10,12 +13,16 @@ public class Frontend extends JFrame {
 	
 	public Frontend() {
 		setUndecorated(true);
-		setBounds(100, 100, 1280, 720);
+		setBounds(100, 100, 1024, 700);
+		setContentPane(contentPane);
 		
-
+		
 	}
 	
 	protected void init() {
+		
+		contentPane.setBorder(BorderFactory.createEtchedBorder());
+		
 		setVisible(true);		
 	}
 

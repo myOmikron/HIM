@@ -7,10 +7,11 @@ public class Backend {
 	
 	public Backend() {
 		front = new Frontend();
-		connection = new ClientConnection("localhost", 3000);
+		//connection = new ClientConnection("localhost", 3000);
 	}
 	
 	protected void init() {
-		connection.init();
+		//connection.init();
+		front.init();
 	}
 }

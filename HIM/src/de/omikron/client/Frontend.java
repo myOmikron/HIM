@@ -3,6 +3,8 @@ package de.omikron.client;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Insets;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -29,19 +31,20 @@ public class Frontend extends JFrame {
 	
 	private JLabel lblBackground;
 	private JLabel lblClose, lblMinimize;
-	private JLabel lblMenue;
+	private JLabel lblMenue, lblSearchClose;
 	
 	private JTextField tfSearch;
 	
 	private JSeparator sideCenterSeperator;
 	
 	private final ImageIcon background = new ImageIcon("res/background.jpg");
-	private final ImageIcon userIconAlpha = new ImageIcon("res/user_alpha.png"), userIconBlue = new ImageIcon("res/user_blue.png");
+	private final ImageIcon userIconAlpha = new ImageIcon("res/user_alpha.png");
 	private final ImageIcon closeIconAlpha = new ImageIcon("res/close_alpha.png"), closeIconGrey = new ImageIcon("res/close_grey.png");
-	private final ImageIcon groupIconAlpha = new ImageIcon("res/group_alpha.png"), groupIconBlue = new ImageIcon("res/group_blue.png");
+	private final ImageIcon closeIconDarkGrey = new ImageIcon("res/close_darkgrey.png");
+	private final ImageIcon groupIconAlpha = new ImageIcon("res/group_alpha.png");
 	private final ImageIcon menueIconAlpha = new ImageIcon("res/menue_alpha.png"), menueIconGrey = new ImageIcon("res/menue_grey.png");
-	private final ImageIcon minimizeIconAlpha = new ImageIcon("res/minimize_alpha.png"), minimizeIconGrey = new ImageIcon("res/minimize_grey.png");
-	private final ImageIcon settingsIconAlpha = new ImageIcon("res/settings_alpha.png"), settingsIconBlue = new ImageIcon("res/settings_blue.png");
+	private final ImageIcon minimizeIconGrey = new ImageIcon("res/minimize_grey.png");
+	private final ImageIcon settingsIconAlpha = new ImageIcon("res/settings_alpha.png");
 	
 	private final Color lightGrey = new Color(230, 230, 230), darkGrey = new Color(204, 204, 204);
 	private final Color white = new Color(250, 250, 250);
@@ -61,6 +64,38 @@ public class Frontend extends JFrame {
 	
 	protected void init() {
 		
+		lblSearchClose = new JLabel(closeIconGrey);
+		lblSearchClose.setBounds(268, 2, 32, 32);
+		lblSearchClose.setOpaque(false);
+		lblSearchClose.setVisible(false);
+		lblSearchClose.addMouseListener(new MouseListener() {
+			@Override public void mouseClicked(MouseEvent e) {  }
+			@Override public void mousePressed(MouseEvent e) {  }
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				lblSearchClose.setIcon(closeIconDarkGrey);
+				sideTopSearchPanel.setBackground(white);
+				sideTopSearchPanel.setBorder(new LineBorder(blue));
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				lblSearchClose.setIcon(closeIconGrey);
+				sideTopSearchPanel.setBackground(lightGrey);
+				sideTopSearchPanel.setBorder(null);
+			}
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				
+				isUserInput = false;
+				tfSearch.setText("Search");
+				updateSearchCloseVisible();
+				requestFocusInWindow();
+			}
+		});
+		sideTopSearchPanel.add(lblSearchClose);
+		
 		tfSearch = new JTextField("Search");
 		tfSearch.setBounds(15, 0, 235, 35);
 		tfSearch.setFont(tfSearch.getFont().deriveFont(16f));
@@ -68,17 +103,43 @@ public class Frontend extends JFrame {
 		tfSearch.setOpaque(false);
 		tfSearch.setCaretPosition(0);
 		tfSearch.setBorder(null);
+		tfSearch.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				tfSearch.setText("Search");
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				tfSearch.setText("");
+			}
+		});
 		tfSearch.addKeyListener(new KeyListener() {
 			@Override public void keyReleased(KeyEvent e) {  }
-			@Override public void keyPressed(KeyEvent e) {  }
+			@Override public void keyTyped(KeyEvent e) {  }
 			@Override
-			public void keyTyped(KeyEvent e) {
-				
-				if(!isUserInput) {
+			public void keyPressed(KeyEvent e) {
+				/*if(!isUserInput) {
 					tfSearch.setText("");
 					isUserInput = true;
+					updateSearchCloseVisible();
+				}*/
+				
+				if(isUserInput && e.getKeyCode() != KeyEvent.VK_SHIFT) {
+					if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+						String ret = tfSearch.getText();
+						ret = ret.substring(0, tfSearch.getText().length()-1);
+						searchForUser(ret);
+					} else {
+						searchForUser(tfSearch.getText() + e.getKeyChar());
+					}
+				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					searchForMessage(tfSearch.getText());
 				}
 			}
+			
 		});
 		tfSearch.addMouseListener(new MouseListener() {
 			@Override public void mouseClicked(MouseEvent e) {  }
@@ -180,7 +241,7 @@ public class Frontend extends JFrame {
 		centerPanel.setBounds(400, 31, 623, 668);
 		contentPane.add(centerPanel);
 		
-		sideTopSearchPanel.setBounds(80, 20, 250, 35);
+		sideTopSearchPanel.setBounds(80, 20, 300, 35);
 		sideTopSearchPanel.setOpaque(true);
 		sideTopSearchPanel.setBackground(lightGrey);
 		sideTopSearchPanel.setBorder(null);
@@ -210,7 +271,7 @@ public class Frontend extends JFrame {
 		sideMidPanel.setOpaque(false);
 		sidePanel.add(sideMidPanel);
 		
-		sidePanel.setBounds(1, 32, 398, 668);
+		sidePanel.setBounds(1, 32, 398, 667);
 		sidePanel.setBackground(white);
 		contentPane.add(sidePanel);
 		
@@ -229,6 +290,22 @@ public class Frontend extends JFrame {
 	
 	public void closeOperation() {
 		System.exit(0);
+	}
+	
+	public void searchForUser(String s) {
+		System.out.println(s);
+	}
+	
+	public void searchForMessage(String s) {
+		
+	}
+	
+	private void updateSearchCloseVisible() {
+		if(isUserInput) {
+			lblSearchClose.setVisible(true);
+		} else {
+			lblSearchClose.setVisible(false);
+		}
 	}
 
 }

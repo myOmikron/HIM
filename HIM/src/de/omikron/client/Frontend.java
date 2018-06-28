@@ -107,11 +107,13 @@ public class Frontend extends JFrame {
 			@Override
 			public void focusLost(FocusEvent e) {
 				tfSearch.setText("Search");
+				isUserInput = false;
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
 				tfSearch.setText("");
+				isUserInput = true;
 			}
 		});
 		tfSearch.addKeyListener(new KeyListener() {
@@ -119,11 +121,9 @@ public class Frontend extends JFrame {
 			@Override public void keyTyped(KeyEvent e) {  }
 			@Override
 			public void keyPressed(KeyEvent e) {
-				/*if(!isUserInput) {
-					tfSearch.setText("");
-					isUserInput = true;
+				if(isUserInput) {
 					updateSearchCloseVisible();
-				}*/
+				}
 				
 				if(isUserInput && e.getKeyCode() != KeyEvent.VK_SHIFT) {
 					if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
@@ -156,7 +156,7 @@ public class Frontend extends JFrame {
 			
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				sideTopSearchPanel.setBorder(new LineBorder(blue));
+				sideTopSearchPanel.setBorder(new LineBorder(blue, 2));
 				sideTopSearchPanel.setBackground(white);
 			}
 		});

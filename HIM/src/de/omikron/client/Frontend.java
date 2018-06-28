@@ -286,6 +286,7 @@ public class Frontend extends JFrame {
 		
 		setVisible(true);
 		requestFocusInWindow();
+		
 	}
 	
 	public void closeOperation() {
@@ -297,7 +298,7 @@ public class Frontend extends JFrame {
 	}
 	
 	public void searchForMessage(String s) {
-		
+		System.out.println(s);
 	}
 	
 	private void updateSearchCloseVisible() {

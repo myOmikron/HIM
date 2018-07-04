@@ -1,8 +1,6 @@
 package de.omikron.client;
 
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -14,10 +12,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+
+import de.omikron.client.MyScrollBar.MyScrollbarUI;
 
 @SuppressWarnings("serial")
 public class Frontend extends JFrame {
@@ -28,6 +31,8 @@ public class Frontend extends JFrame {
 	private JPanel centerMidPanel = new JPanel(null), centerBottomPanel = new JPanel(null), centerTopPanel = new JPanel(null);
 	private JPanel sideTopPanel = new JPanel(null), sideMidPanel = new JPanel(null);
 	private JPanel sideTopSearchPanel = new JPanel(null);
+	
+	private JScrollPane sideMidScrollPane = new JScrollPane();
 	
 	private JLabel lblBackground;
 	private JLabel lblClose, lblMinimize;
@@ -106,13 +111,14 @@ public class Frontend extends JFrame {
 		tfSearch.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				tfSearch.setText("Search");
+				sideTopSearchPanel.setBackground(lightGrey);
+				sideTopSearchPanel.setBorder(null);
 				isUserInput = false;
 			}
-			
 			@Override
 			public void focusGained(FocusEvent e) {
-				tfSearch.setText("");
+				sideTopSearchPanel.setBackground(white);
+				sideTopSearchPanel.setBorder(new LineBorder(blue, 2));
 				isUserInput = true;
 			}
 		});
@@ -121,18 +127,14 @@ public class Frontend extends JFrame {
 			@Override public void keyTyped(KeyEvent e) {  }
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(isUserInput) {
+				if(e.getKeyCode() != KeyEvent.VK_ENTER && e.getKeyCode() != KeyEvent.VK_BACK_SPACE && e.getKeyCode() != KeyEvent.VK_SHIFT) {
+					searchForUser(tfSearch.getText() + e.getKeyChar());
+					isUserInput = true;
 					updateSearchCloseVisible();
 				}
 				
-				if(isUserInput && e.getKeyCode() != KeyEvent.VK_SHIFT) {
-					if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-						String ret = tfSearch.getText();
-						ret = ret.substring(0, tfSearch.getText().length()-1);
-						searchForUser(ret);
-					} else {
-						searchForUser(tfSearch.getText() + e.getKeyChar());
-					}
+				if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+					searchForUser(tfSearch.getText().substring(0, tfSearch.getText().length()-1));
 				}
 				
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -150,12 +152,25 @@ public class Frontend extends JFrame {
 			}
 			@Override  
 			public void mouseExited(MouseEvent e) {
-				sideTopSearchPanel.setBorder(null);
-				sideTopSearchPanel.setBackground(lightGrey);
+				if(isUserInput) {
+					if(tfSearch.getText() == "") {
+						isUserInput = false;
+						tfSearch.setText("Search");
+						sideTopSearchPanel.setBorder(null);
+						sideTopSearchPanel.setBackground(lightGrey);
+					}
+				} else {
+					tfSearch.setText("Search");
+					sideTopSearchPanel.setBorder(null);
+					sideTopSearchPanel.setBackground(lightGrey);
+				}
 			}
 			
 			@Override
 			public void mouseEntered(MouseEvent e) {
+				if(!isUserInput) {
+					tfSearch.setText("");
+				}
 				sideTopSearchPanel.setBorder(new LineBorder(blue, 2));
 				sideTopSearchPanel.setBackground(white);
 			}
@@ -248,26 +263,51 @@ public class Frontend extends JFrame {
 		sideTopSearchPanel.addMouseListener(new MouseListener() {
 			@Override public void mouseClicked(MouseEvent e) {  }
 			@Override public void mousePressed(MouseEvent e) {  }
-			@Override public void mouseReleased(MouseEvent e) {  }
 			@Override
+			public void mouseReleased(MouseEvent e) {
+				tfSearch.setCaretPosition(0);
+			}
+			@Override  
 			public void mouseExited(MouseEvent e) {
-				sideTopSearchPanel.setBackground(lightGrey);
-				sideTopSearchPanel.setBorder(null);
+				if(isUserInput) {
+					if(tfSearch.getText() == "") {
+						isUserInput = false;
+						tfSearch.setText("Search");
+						sideTopSearchPanel.setBorder(null);
+						sideTopSearchPanel.setBackground(lightGrey);
+					}
+				} else {
+					tfSearch.setText("Search");
+					sideTopSearchPanel.setBorder(null);
+					sideTopSearchPanel.setBackground(lightGrey);
+				}
 			}
 			
 			@Override
 			public void mouseEntered(MouseEvent e) {
+				if(!isUserInput) {
+					tfSearch.setText("");
+				}
+				sideTopSearchPanel.setBorder(new LineBorder(blue, 2));
 				sideTopSearchPanel.setBackground(white);
-				sideTopSearchPanel.setBorder(new LineBorder(blue));
 			}
 		});
 		sideTopPanel.add(sideTopSearchPanel);
 		
-		sideTopPanel.setBounds(0, 0, 398, 150);
+		sideTopPanel.setBounds(0, 0, 398, 80);
 		sideTopPanel.setOpaque(false);
 		sidePanel.add(sideTopPanel);
 		
-		sideMidPanel.setBounds(0, 150, 398, 518);
+		sideMidScrollPane.setBounds(0, 0, 397, 587);
+		sideMidScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		sideMidScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		sideMidScrollPane.setUI(new MyScrollbarUI());
+		sideMidScrollPane.setOpaque(false);
+		sideMidScrollPane.getViewport().setOpaque(false);
+		sideMidScrollPane.setBorder(null);
+		sideMidPanel.add(sideMidScrollPane);
+		
+		sideMidPanel.setBounds(0, 80, 398, 588);
 		sideMidPanel.setOpaque(false);
 		sidePanel.add(sideMidPanel);
 		
